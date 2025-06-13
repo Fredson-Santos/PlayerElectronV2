@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://cdn.jsdelivr.net; object-src 'self';">
+    <title>IPTV Player</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-white font-sans">
+
+    <div id="login-screen" class="screen flex items-center justify-center h-screen">
+        <div class="login-box bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-sm">
+            <h1 class="text-2xl font-bold mb-6 text-center text-cyan-400">IPTV Player Login</h1>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="host" class="block mb-2 text-sm font-medium text-gray-300">Host URL</label>
+                    <input type="text" id="host" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" placeholder="http://domain:port" required>
+                </div>
+                <div class="mb-4">
+                    <label for="username" class="block mb-2 text-sm font-medium text-gray-300">Usuário</label>
+                    <input type="text" id="username" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block mb-2 text-sm font-medium text-gray-300">Senha</label>
+                    <input type="password" id="password" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5" required>
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <input id="remember-me" type="checkbox" class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500">
+                        <label for="remember-me" class="ml-2 text-sm font-medium text-gray-300">Lembrar-me</label>
+                    </div>
+                </div>
+                <button type="submit" class="w-full text-white bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:outline-none focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Entrar</button>
+                <p id="login-error" class="text-red-500 text-xs mt-4 text-center"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-screen" class="screen hidden h-screen flex flex-col">
+        <header class="flex items-center justify-between p-4 bg-gray-800 shadow-md">
+            <div class="flex items-center">
+                <h1 class="text-xl font-bold text-cyan-400">IPTV Player</h1>
+                <nav class="ml-8">
+                    <button data-section="live" class="nav-btn active px-4 py-2 rounded">Ao Vivo</button>
+                    <button data-section="movie" class="nav-btn px-4 py-2 rounded">Filmes</button>
+                    <button data-section="series" class="nav-btn px-4 py-2 rounded">Séries</button>
+                </nav>
+            </div>
+            <div class="w-1/3">
+                <input type="text" id="search-box" class="bg-gray-700 w-full p-2 rounded-lg text-sm" placeholder="Buscar...">
+            </div>
+            <button id="logout-btn" class="text-gray-400 hover:text-white">Sair</button>
+        </header>
+
+        <main class="flex flex-1 overflow-hidden">
+            <aside id="category-sidebar" class="w-64 bg-gray-800 p-4 overflow-y-auto">
+                <ul id="category-list">
+                    </ul>
+            </aside>
+            <section id="content-grid" class="flex-1 p-4 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+                </section>
+        </main>
+    </div>
+
+    <div id="player-screen" class="screen hidden fixed inset-0 bg-black flex items-center justify-center" tabindex="-1">
+        <video id="video-player" class="w-full h-full"></video>
+        <div id="player-controls" class="absolute bottom-0 left-0 right-0 p-4 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
+            <button id="back-to-main" class="absolute top-4 left-4 text-2xl">&larr;</button>
+        </div>
+        <div id="player-feedback" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl bg-black bg-opacity-70 px-6 py-4 rounded-lg opacity-0 transition-opacity duration-500 pointer-events-none"></div>
+    </div>
+    
+    <div id="series-info-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl h-5/6 flex flex-col">
+            <header class="p-4 border-b border-gray-700 flex justify-between items-center flex-shrink-0">
+                <h2 id="series-modal-title" class="text-xl font-bold text-cyan-400"></h2>
+                <button id="close-series-modal" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </header>
+            <main id="series-modal-content" class="p-6 overflow-y-auto">
+                </main>
+        </div>
+    </div>
+
+    <div id="loading-spinner" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-cyan-500"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./renderer.js"></script>
+</body>
+</html>
